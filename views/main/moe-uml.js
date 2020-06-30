@@ -25,8 +25,11 @@ if (typeof window.Raphael === 'undefined') window.Raphael = require('raphael');
 const LRUCache = require('lrucache');
 var rendered = LRUCache(1024);
 
-const Flowchart = require('flowchart.js'),
-      Sequence = require('js-sequence-diagrams');
+const Flowchart = require('flowchart.js');
+const Sequence = require('js-sequence-diagrams');
+const Mermaid = require('mermaid/dist/mermaid');
+
+Mermaid.ini
 
 var div = document.createElement('div');
 div.style.display = 'none';
@@ -37,6 +40,7 @@ function renderSequence(str) {
     diagram.drawSVG(div, { theme: 'simple' });
     let res = div.innerHTML;
     div.innerHTML = '';
+    console.log(str)
     return `<div>${res}</div>`;
 }
 
@@ -48,6 +52,12 @@ function renderFlow(str) {
     return `<div>${res}</div>`;
 }
 
+function renderMermaid(str) {
+    const id = Math.random().toString(36).slice(2);
+    const res = Mermaid.mermaidAPI.render(`mermaid-${id}`, str);
+    return `<div class="mermaid-container">${res}</div>`;
+}
+
 function render(str, type) {
     let res = rendered.get(type + str);
     if (typeof res === 'string') return res;
@@ -55,6 +65,7 @@ function render(str, type) {
     try {
         if (type === 'sequence') res = renderSequence(str);
         else if (type === 'flow') res = renderFlow(str);
+        else if (type === 'mermaid') res = renderMermaid(str);
     } catch(e) {
         res = e;
     }
